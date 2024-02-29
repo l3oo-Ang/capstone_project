@@ -1,0 +1,11 @@
+streamlit
+# audio-recorder-streamlit
+mysql-connector-python
+SpeechRecognition
+gTTS
+torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+git+https://github.com/huggingface/transformers
+bitsandbytes
+accelerate
+git+https://github.com/huggingface/transformers.git@main
+pyaudio
