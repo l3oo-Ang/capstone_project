@@ -28,14 +28,16 @@ def question_page(st, i):
     
     def record_audio():
         r = sr.Recognizer()
+        r.pause_threshold = 10.0
         mic = sr.Microphone()
 
         with mic as source:
+            r.adjust_for_ambient_noise(source)
             audio_data = r.listen(source)
 
         return audio_data
     
-    def save_audio_file(audio_data, directory = "D:/capestone_project/opic/records"):
+    def save_audio_file(audio_data, directory = "D:/capstone_project/opic/records"):
         if not os.path.exists(directory):
             os.makedirs(directory)
 
