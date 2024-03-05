@@ -13,9 +13,6 @@ from transformers import (
     pipeline
 )
 
-# from peft import PeftModel, PeftConfig
-from audio_recorder_streamlit import audio_recorder
-
 def question_page(st, i):
     st.markdown(f"<h1 style='text-align: center; font-size: 1.5em;'>Question {i}</h1>", unsafe_allow_html=True)
     st.markdown("<hr></hr>", unsafe_allow_html=True)
@@ -27,7 +24,7 @@ def question_page(st, i):
     
     def record_audio():
         r = sr.Recognizer()
-        r.pause_threshold = 10.0
+        r.pause_threshold = 5.0
         mic = sr.Microphone()
 
         with mic as source:
@@ -60,12 +57,14 @@ def question_page(st, i):
         print(f"Transcript saved to {transcript_filepath}")
 
     def transcribe_audio_in_background(audio_filename, whisper_pipe):
-        # Function to be run in a separate thread for transcribing audio
+        '''
+            Function to be run in a separate thread for transcribing audio
+        '''
         # result = st.session_state.whisper_pipe(audio_filename, generate_kwargs={"language": "english"})
         result = whisper_pipe(audio_filename, generate_kwargs={"language": "english"})
         transcript = result["text"]
         save_transcription_to_file(transcript, audio_filename, save_directory='D:/capstone_project/opic/transcription')
-        st.session_state.transcript_text.append(transcript)
+        # st.session_state.transcript_text.append(transcript)
         # transcript_filename = audio_filename.replace(".wav", "_transcript.txt")
 
     def start_transcription_thread(audio_filename, whisper_pipe):
@@ -73,28 +72,17 @@ def question_page(st, i):
         thread.start()
 
     def text_to_speech(text, lang='en'):
-        # 임시 파일 생성
-        with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
-            temp_filename = temp_file.name
-
         tts = gTTS(text=text, lang=lang, slow=False)
-        tts.save(temp_filename)
-        return temp_filename
+        # 임시 파일 생성
+        with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as tf:
+            tts.save(tf.name)
+        return tf.name
 
     # TTS 버튼
     if st.button(f"question {i}"):
         question = st.session_state.question_list[i - 1]
         output_file = text_to_speech(question, lang="en")
         st.audio(output_file, format='audio/wav')
-
-    
-    # audio_bytes = audio_recorder(
-    #     energy_threshold=(-1.0, 1.0),
-    #     pause_threshold=60.0,
-    # )
-
-    # if audio_bytes:
-    #     st.audio(audio_bytes, format="audio/wav")
         
     if st.button("녹음 시작"):
         with st.spinner("녹음 중..."):
